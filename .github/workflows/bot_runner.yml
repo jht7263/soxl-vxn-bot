@@ -1,0 +1,31 @@
+name: Run Telegram Bots
+
+on:
+  schedule:
+    # UTC 기준 시간 설정 (한국 시간 아침 9시 = UTC 0시, 저녁 9시 = UTC 12시)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # 수동 테스트 버튼 활성화
+
+jobs:
+  run-bots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install yfinance requests schedule
+
+      - name: Run SOXL Bot
+        run: python soxl_bot.py
+
+      - name: Run VXN Bot
+        run: python vxn_bot.py
+        
+        
