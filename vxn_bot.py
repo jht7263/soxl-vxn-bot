@@ -3,8 +3,8 @@ import requests
 import yfinance as yf
 
 # 텔레그램 봇 설정
-TOKEN = "본인의_텔레그램_봇_토큰"
-CHAT_ID = "본인의_숫자_ID"
+TOKEN = "9007580045:AAHe_CRSIUg9FIk2I2WSdN8jjsUj9uULZcM" 
+CHAT_ID = "7063499674"
 
 
 def get_vxn_data():
