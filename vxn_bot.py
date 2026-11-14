@@ -7,7 +7,6 @@ CHAT_ID = "본인의_숫자_ID"
 
 def get_vxn_data():
     try:
-        # period를 5d에서 1mo(한 달)로 늘려서 데이터 누락 방지
         vxn = yf.Ticker("^VXN")
         df = vxn.history(period="1mo")
         
