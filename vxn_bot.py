@@ -1,27 +1,24 @@
-import time
 import requests
 import yfinance as yf
-import schedule
 
 # [설정] 텔레그램 봇 토큰과 본인의 챗 ID 입력
-TOKEN = "9263607392:AAGpLBgWnijtqMgIprGMvauSrugBcsg7eRM"      
-CHAT_ID = "7063499674"        
+TOKEN = "아까_발급받은_VXN_봇_토큰"      
+CHAT_ID = "본인의_숫자_ID"        
 
 def get_vxn_data():
     try:
-        # 야후 파이낸스에서 VXN(^VXN) 지수 데이터 가져오기
+        # period를 5d에서 1mo(한 달)로 늘려서 데이터 누락 방지
         vxn = yf.Ticker("^VXN")
-        df = vxn.history(period="5d")
+        df = vxn.history(period="1mo")
         
-        if len(df) == 0:
-            return "⚠️ VXN 지수 데이터를 불러오지 못했습니다."
+        if df.empty or len(df) < 2:
+            return "⚠️ VXN 지수 데이터를 불러오기에 데이터가 부족합니다."
             
         latest_close = df['Close'].iloc[-1]
-        prev_close = df['Close'].iloc[-2] if len(df) > 1 else latest_close
+        prev_close = df['Close'].iloc[-2]
         diff = latest_close - prev_close
         diff_percent = (diff / prev_close) * 100
         
-        # 30 이상 여부에 따른 매수 타이밍 판단
         if latest_close >= 30:
             status = "🚨 **[공포 구간 / 강력 매수 타이밍!]**\nVXN이 30을 돌파했습니다. 적극적인 분할 매수를 검토해 보세요!"
         else:
@@ -51,20 +48,6 @@ def send_telegram_message(text):
     else:
         print(f"발송 실패: {response.text}")
 
-def job():
-    print("VXN 지수 알림 실행 중...")
+if __name__ == "__main__":
     msg = get_vxn_data()
     send_telegram_message(msg)
-
-if __name__ == "__main__":
-    print("VXN 봇 테스트 전송을 시작합니다...")
-    job() # 실행 시 테스트로 즉시 1회 전송
-    
-    # 매일 아침 9시와 저녁 9시에 알림 전송 예약
-    schedule.every().day.at("09:00").do(job)
-    schedule.every().day.at("21:00").do(job)
-
-    print("매일 아침 9시, 저녁 9시 VXN 알림 대기 중...")
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
